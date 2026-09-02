@@ -3,10 +3,14 @@ package io.github.placereporter99.utilitybot;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.concurrent.Executor;
 
 import com.github.mangstadt.sochat4j.*;
 import com.github.mangstadt.sochat4j.event.MessagePostedEvent;
+import com.sun.net.httpserver.HttpServer;
+import org.jetbrains.annotations.NotNull;
 
 public class Main {
     public static boolean prepareRoom(Room room, CommandHandler handler){
@@ -31,7 +35,7 @@ public class Main {
 
     public static boolean leaveRoom(Room room){
         try {
-            room.sendMessage("Leaving, bye!");
+            room.sendMessage("UtilityBot (testing) Offline!");
             room.leave();
             return true;
         } catch (IOException e) {
@@ -48,6 +52,11 @@ public class Main {
         try (var client = ChatClient.connect(site, email, password)) {
             var rooms = Arrays.stream(roomIds).map(x -> {try {return client.joinRoom(x);} catch (IOException e) {throw new RuntimeException(e);} catch (RoomNotFoundException ex) {throw new RuntimeException(ex);}}).toArray();
             var handler = new CommandHandler();
+            var http = HttpServer.create(new InetSocketAddress(10000), -1);
+
+            http.setExecutor(null);
+            http.createContext("/", new HttpRequestHandler());
+            http.start();
 
             Arrays.stream(rooms).map(x -> prepareRoom((Room) x, handler)).toArray();
 
