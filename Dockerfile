@@ -1,5 +1,5 @@
 # --- STAGE 1: Build and Compile ---
-FROM maven:3.9-eclipse-temurin-17 AS builder
+FROM maven:3.9-eclipse-temurin-26-alpine AS builder
 WORKDIR /app
 
 # 1. Copy ONLY the configuration files to fetch dependencies first
