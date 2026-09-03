@@ -25,7 +25,7 @@ class StreamCollector implements Runnable {
 }
 
 public class HttpRequestHandler implements HttpHandler {
-    private final PipedInputStream inputStream = new PipedInputStream();
+    private final PipedInputStream inputStream = new PipedInputStream(65536);
     private final OutputStream outputStream;
     private final ByteArrayOutputStream logs = new ByteArrayOutputStream();
     private final Thread thread;
@@ -50,10 +50,10 @@ public class HttpRequestHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        var response = "<h1><a href=\"https://chat.stackexchange.com/rooms/164579/utility-bot-hut\">Try it here</a></h1><br><h2>Logs</h2><br><pre>" + logs.toString(StandardCharsets.UTF_8) + "</pre>";
-        exchange.sendResponseHeaders(200, response.length());
+        var response = ("<h1><a href=\"https://chat.stackexchange.com/rooms/164579/utility-bot-hut\">Try it here</a></h1><br><h2>Logs</h2><br><pre>" + logs.toString(StandardCharsets.UTF_8) + "</pre>").getBytes(StandardCharsets.UTF_8);
+        exchange.sendResponseHeaders(200, response.length);
         OutputStream os = exchange.getResponseBody();
-        os.write(response.getBytes());
+        os.write(response);
         os.close();
     }
 }
