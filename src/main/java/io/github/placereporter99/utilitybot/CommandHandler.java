@@ -49,10 +49,13 @@ public class CommandHandler {
         });
     }
 
-    public String handleCommand(ChatMessage message) {
+    public String handleCommand(ChatMessage message, int id) {
         var text = message.content().getContent();
         var arr = text.split(" ", 2);
         var get = handlers.get(arr[0]);
+        System.out.println("________________________________________________________________________");
+        System.out.print("Room ID: ");
+        System.out.println(id);
         System.out.print("Command: ");
         System.out.println(arr[0]);
         String one;
@@ -66,10 +69,15 @@ public class CommandHandler {
         }
         System.out.print("Args: ");
         System.out.println(one);
+        String finalMessage;
         try {
-            return get.apply(one, message);
+            finalMessage = get.apply(one, message);
         } catch (Exception e) {
-            return buildReply(message, "An error occurred: `" + e.toString() + "`");
+            finalMessage = buildReply(message, "An error occurred: `" + e.toString() + "`");
         }
+        System.out.print("Final message: ");
+        System.out.print(finalMessage);
+        System.out.println("________________________________________________________________________");
+        return finalMessage;
     }
 }

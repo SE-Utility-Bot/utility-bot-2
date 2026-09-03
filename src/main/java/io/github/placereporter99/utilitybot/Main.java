@@ -21,7 +21,7 @@ public class Main {
         try {
             room.addEventListener(MessagePostedEvent.class, event -> {
                 try {
-                    var result = handler.handleCommand(event.getMessage());
+                    var result = handler.handleCommand(event.getMessage(), room.getRoomId());
                     if (result != null) {
                         room.sendMessage(result);
                     }
