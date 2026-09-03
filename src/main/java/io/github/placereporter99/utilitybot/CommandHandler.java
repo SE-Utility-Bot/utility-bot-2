@@ -76,7 +76,7 @@ public class CommandHandler {
             finalMessage = buildReply(message, "An error occurred: `" + e.toString() + "`");
         }
         System.out.print("Final message: ");
-        System.out.print(finalMessage);
+        System.out.println(finalMessage);
         System.out.println("________________________________________________________________________");
         return finalMessage;
     }

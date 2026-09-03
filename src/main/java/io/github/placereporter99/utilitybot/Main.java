@@ -1,8 +1,6 @@
 package io.github.placereporter99.utilitybot;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 
@@ -59,7 +57,10 @@ public class Main {
             var http = HttpServer.create(new InetSocketAddress(10000), -1);
 
             http.setExecutor(null);
-            http.createContext("/", new HttpRequestHandler());
+            var httpRequestHandler = new HttpRequestHandler();
+            System.setOut(httpRequestHandler.getPrintStream());
+            System.setErr(httpRequestHandler.getPrintStream());
+            http.createContext("/", httpRequestHandler);
             http.start();
 
             Arrays.stream(rooms).map(x -> prepareRoom((Room) x, handler)).toArray();
@@ -86,7 +87,7 @@ public class Main {
             System.err.println("Cannot join room because it is private.");
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Somehow was unable to be caught earlier...");
+            System.err.println("Must've been some HTTP stuff.");
         }
     }
 }
