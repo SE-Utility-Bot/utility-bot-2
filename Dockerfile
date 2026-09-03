@@ -1,5 +1,5 @@
 # --- Runtime Stage ---
-FROM eclipse-temurin:26-jre
+FROM eclipse-temurin:26-jdk-alpine
 WORKDIR /app
 COPY src/ ./src/
 WORKDIR /app/src/main/java/io/github/placereporter99/utilitybot
