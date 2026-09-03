@@ -56,6 +56,8 @@ public class CommandHandler {
         System.out.println("________________________________________________________________________");
         System.out.print("Room ID: ");
         System.out.println(id);
+        System.out.print("Received message: ");
+        System.out.println(message.content().getContent());
         System.out.print("Command: ");
         System.out.println(arr[0]);
         String one;
@@ -65,6 +67,8 @@ public class CommandHandler {
             one = null;
         }
         if (get == null) {
+            System.out.println("Command does not exist, will not send any message.");
+            System.out.println("________________________________________________________________________");
             return null;
         }
         System.out.print("Args: ");

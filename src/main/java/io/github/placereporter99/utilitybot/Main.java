@@ -65,7 +65,7 @@ public class Main {
 
             Arrays.stream(rooms).map(x -> prepareRoom((Room) x, handler)).toArray();
 
-            System.out.println("Press Enter to terminate the bot.");
+            System.out.println("Bot has started!");
             try {
                 Thread.currentThread().join();
             } catch (Exception e) {
@@ -87,7 +87,7 @@ public class Main {
             System.err.println("Cannot join room because it is private.");
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Must've been some HTTP stuff.");
+            System.err.println("Issue with HTTP.");
         }
     }
 }
