@@ -5,12 +5,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
-import java.util.concurrent.Executor;
 
-import com.github.mangstadt.sochat4j.*;
+import com.github.mangstadt.sochat4j.Room;
+import com.github.mangstadt.sochat4j.RoomNotFoundException;
+import com.github.mangstadt.sochat4j.RoomPermissionException;
+import com.github.mangstadt.sochat4j.Site;
+import com.github.mangstadt.sochat4j.InvalidCredentialsException;
+import com.github.mangstadt.sochat4j.ChatClient;
+import com.github.mangstadt.sochat4j.PrivateRoomException;
 import com.github.mangstadt.sochat4j.event.MessagePostedEvent;
 import com.sun.net.httpserver.HttpServer;
-import org.jetbrains.annotations.NotNull;
 
 public class Main {
     public static boolean prepareRoom(Room room, CommandHandler handler){
