@@ -28,7 +28,7 @@
                     <archive>
                         <manifest>
                             <!-- CHANGE THIS to match the exact package structure of your Main class -->
-                            <mainClass>com.example.utilitybot.Main</mainClass>
+                            <mainClass>io.github.placereporter99.utilitybot.Main</mainClass>
                         </manifest>
                     </archive>
                     <!-- Forces it to output just one clean jar file name -->
