@@ -65,14 +65,15 @@ public class Main {
             Arrays.stream(rooms).map(x -> prepareRoom((Room) x, handler)).toArray();
 
             System.out.println("Press Enter to terminate the bot.");
-            try (var reader = new BufferedReader(new InputStreamReader(System.in))) {
-                reader.readLine();
-            } catch (IOException e) {
+            try {
+                Thread.currentThread().join();
+            } catch (Exception e) {
                 e.printStackTrace();
-                System.err.println("Restarting bot...");
                 try {
                     Arrays.stream(rooms).map(x -> leaveRoom((Room) x)).toArray();
-                } catch (Exception ee) {ee.printStackTrace();}
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
                 main(args);
             }
 
