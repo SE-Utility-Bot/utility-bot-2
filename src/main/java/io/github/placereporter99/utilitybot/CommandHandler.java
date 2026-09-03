@@ -58,6 +58,8 @@ public class CommandHandler {
         System.out.println(id);
         System.out.print("Received message: ");
         System.out.println(message.content().getContent());
+        System.out.print("Sent by: ");
+        System.out.println(String.format("%s (%s)", message.username(), message.userId()));
         System.out.print("Command: ");
         System.out.println(arr[0]);
         String one;
