@@ -18,16 +18,31 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
                 <configuration>
+                    <!-- This embeds all your dependencies straight into the final JAR -->
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                     <archive>
                         <manifest>
-                            <addClasspath>true</addClasspath>
                             <!-- CHANGE THIS to match the exact package structure of your Main class -->
-                            <mainClass>io.github.placereporter99.utilitybot.Main</mainClass>
+                            <mainClass>com.example.utilitybot.Main</mainClass>
                         </manifest>
                     </archive>
+                    <!-- Forces it to output just one clean jar file name -->
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase> <!-- binds it to the 'mvn package' step -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
