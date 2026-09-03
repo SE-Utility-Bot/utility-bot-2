@@ -5,6 +5,5 @@ COPY src/ ./src/
 WORKDIR /app/src/main/java/io/github/placereporter99/utilitybot
 EXPOSE 10000
 # Runs the application using your specific Main class entry point
-RUN javac Main.java
 ENTRYPOINT ["java"]
-CMD ["Main"]
+CMD ["Main.java"]
