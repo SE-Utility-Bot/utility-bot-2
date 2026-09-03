@@ -15,7 +15,7 @@ import com.github.mangstadt.sochat4j.event.MessagePostedEvent;
 import com.sun.net.httpserver.HttpServer;
 
 public class Main {
-    public static boolean prepareRoom(Room room, CommandHandler handler){
+    public static void prepareRoom(Room room, CommandHandler handler){
         try {
             room.addEventListener(MessagePostedEvent.class, event -> {
                 try {
@@ -29,17 +29,15 @@ public class Main {
             });
 
             room.sendMessage("UtilityBot (testing) Online!");
-            return true;
         } catch (RoomNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static boolean leaveRoom(Room room){
+    public static void leaveRoom(Room room){
         try {
             room.sendMessage("UtilityBot (testing) Offline!");
             room.leave();
-            return true;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -58,12 +56,12 @@ public class Main {
 
             http.setExecutor(null);
             var httpRequestHandler = new HttpRequestHandler();
-            System.setOut(httpRequestHandler.getPrintStream());
-            System.setErr(httpRequestHandler.getPrintStream());
+            System.setOut(DualOutputStream.teeWithOut(httpRequestHandler.getOutputStream()));
+            System.setErr(DualOutputStream.teeWithErr(httpRequestHandler.getOutputStream()));
             http.createContext("/", httpRequestHandler);
             http.start();
 
-            Arrays.stream(rooms).map(x -> prepareRoom((Room) x, handler)).toArray();
+            Arrays.stream(rooms).forEach(x -> prepareRoom((Room) x, handler));
 
             System.out.println("Bot has started!");
             try {
@@ -71,14 +69,14 @@ public class Main {
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
-                    Arrays.stream(rooms).map(x -> leaveRoom((Room) x)).toArray();
+                    Arrays.stream(rooms).forEach(x -> leaveRoom((Room) x));
                 } catch (Exception ee) {
                     ee.printStackTrace();
                 }
                 main(args);
             }
 
-            Arrays.stream(rooms).map(x -> leaveRoom((Room) x)).toArray();
+            Arrays.stream(rooms).forEach(x -> leaveRoom((Room) x));
         } catch (InvalidCredentialsException e) {
             System.err.println("Login credentials invalid.");
         } catch (RoomNotFoundException e) {

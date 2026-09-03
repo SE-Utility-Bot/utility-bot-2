@@ -26,12 +26,12 @@ class StreamCollector implements Runnable {
 
 public class HttpRequestHandler implements HttpHandler {
     private final PipedInputStream inputStream = new PipedInputStream();
-    private final PrintStream printStream;
+    private final OutputStream outputStream;
     private final ByteArrayOutputStream logs = new ByteArrayOutputStream();
     private final Thread thread;
 
     public HttpRequestHandler() throws IOException {
-        printStream = new PrintStream(new PipedOutputStream(inputStream));
+        outputStream = new PipedOutputStream(inputStream);
         thread = new Thread(new StreamCollector(this));
         thread.start();
     }
@@ -40,8 +40,8 @@ public class HttpRequestHandler implements HttpHandler {
         return inputStream;
     }
 
-    public PrintStream getPrintStream() {
-        return printStream;
+    public OutputStream getOutputStream() {
+        return outputStream;
     }
 
     public void addLogs(int byteValue) {

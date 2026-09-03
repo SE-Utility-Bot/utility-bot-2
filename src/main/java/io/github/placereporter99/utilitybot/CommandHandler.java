@@ -29,14 +29,14 @@ public class CommandHandler {
             try (var resource = CommandHandler.class.getClassLoader().getResourceAsStream("status.txt")) {
                 var lines = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines().toList();
                 var index = new SecureRandom().nextInt(lines.size());
-                return buildReply(msg, lines.get(index));
+                return lines.get(index);
             } catch (IOException e) {
-                return buildReply(msg, "Weird IO things prevent me from doing anything else!!!!");
+                return "Weird IO things prevent me from doing anything else!!!!";
             } catch (NullPointerException e) {
-                return buildReply(msg, "Oh no it's null and void!!!!");
+                return "Oh no it's null and void!!!!";
             }
         });
-        put("ping", (args, msg) -> buildReply(msg, String.format("@%s you have been pinged by ^", args.replace(" ", ""))));
+        put("ping", (args, msg) -> String.format("@%s you have been pinged by ^", args.replace(" ", "")));
         put("randombytes", (args, msg) -> {
             if (args.length() <= 3) {
                 var num = Integer.parseInt(args);
