@@ -51,7 +51,7 @@ public class ArbitraryCodeExecutor {
                     "-XX:MaxMetaspaceSize=24m",     // Cap class definition memory
                     "-XX:ReservedCodeCacheSize=16m",// Stop the JIT compiler from reserving huge RAM blocks
                     "-XX:+UseSerialGC",             // Use the most memory-efficient garbage collector
-                    "UntrustedCode"
+                    "Main"
             );
             pb.environment().clear();
             pb.redirectErrorStream(true);
@@ -77,7 +77,7 @@ public class ArbitraryCodeExecutor {
             // Ensure disk cleanup always runs
             try {
                 Files.deleteIfExists(sourceFile.toPath());
-                Files.deleteIfExists(new File("UntrustedCode.class").toPath());
+                Files.deleteIfExists(new File("Main.class").toPath());
             } catch (IOException e) {
                 System.err.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 System.err.println("WARNING: Failed to delete generated code files. This may bloat memory.");
