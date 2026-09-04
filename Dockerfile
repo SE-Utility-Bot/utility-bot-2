@@ -14,7 +14,7 @@ COPY src ./src
 # 4. Compile and package everything into a single, executable .jar file
 RUN mvn clean package -DskipTests
 # --- Runtime Stage ---
-FROM eclipse-temurin:26-jre-alpine
+FROM eclipse-temurin:26-jdk-alpine
 WORKDIR /app/src/main/java/io/github/placereporter99/utilitybot
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 10000
