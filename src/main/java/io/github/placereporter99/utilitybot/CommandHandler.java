@@ -57,7 +57,7 @@ public class CommandHandler {
         var arr = text.split(" ", 2);
         var get = handlers.get(arr[0]);
         System.out.println("________________________________________________________________________");
-        System.out.println(LocalDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME));
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         System.out.print("Room ID: ");
         System.out.println(id);
         System.out.print("Received message: ");
