@@ -9,6 +9,7 @@ import java.util.*;
 import java.io.*;
 import java.util.function.*;
 import java.security.SecureRandom;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class CommandHandler {
     private final HashMap<String, BiFunction<String, ChatMessage, String>> handlers = new HashMap<>();
@@ -81,7 +82,7 @@ public class CommandHandler {
         System.out.println(one);
         String finalMessage;
         try {
-            finalMessage = get.apply(one, message);
+            finalMessage = get.apply(StringEscapeUtils.unescapeHtml4(one), message);
         } catch (Exception e) {
             finalMessage = buildReply(message, "An error occurred: `" + e + "`");
         }
