@@ -69,7 +69,7 @@ public class CommandHandler {
         System.out.println(arr[0]);
         String one;
         try {
-            one = arr[1];
+            one = StringEscapeUtils.unescapeHtml4(arr[1]);
         } catch (ArrayIndexOutOfBoundsException _) {
             one = null;
         }
@@ -82,7 +82,7 @@ public class CommandHandler {
         System.out.println(one);
         String finalMessage;
         try {
-            finalMessage = get.apply(StringEscapeUtils.unescapeHtml4(one), message);
+            finalMessage = get.apply(one, message);
         } catch (Exception e) {
             finalMessage = buildReply(message, "An error occurred: `" + e + "`");
         }
