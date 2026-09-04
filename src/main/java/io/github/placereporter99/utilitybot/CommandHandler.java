@@ -55,7 +55,7 @@ public class CommandHandler {
 
     public String handleCommand(ChatMessage message, int id) {
         var text = message.content().getContent();
-        var arr = text.split(" ", 2);
+        var arr = text.split("[ \n]", 2);
         var get = handlers.get(arr[0]);
         System.out.println("________________________________________________________________________");
         System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
