@@ -27,7 +27,7 @@ public class ArbitraryCodeExecutor {
         try (FileWriter writer = new FileWriter(sourceFile)) {
             writer.write(code);
         } catch (IOException e) {
-            return indentLinesByFourSpaces(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n")));
+            return "    " + e.getMessage() + "\n" + indentLinesByFourSpaces(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n")));
         }
         try {
             // 1. Compile and catch compiler errors in memory
@@ -37,7 +37,7 @@ public class ArbitraryCodeExecutor {
 
             String temp = outputStream.toString(StandardCharsets.UTF_8);
 
-            String compileLogs = "Compile logs (" + (compileResult == 0 ? "success" : "error") + ") :\n\n" + (temp.isEmpty() ? "<no logs>" : indentLinesByFourSpaces(temp));
+            String compileLogs = "    Compile logs (" + (compileResult == 0 ? "success" : "error") + ") :\n\n" + (temp.isEmpty() ? "<no logs>" : indentLinesByFourSpaces(temp));
 
             if (compileResult != 0) {
                 return compileLogs;
@@ -64,15 +64,15 @@ public class ArbitraryCodeExecutor {
             if (!finished) {
                 process.destroyForcibly();
                 logs = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-                finalLogs = "Process timed out after %d seconds, may still have logs:\n\n".formatted(timeout) + (logs.isEmpty() ? "<no logs>" : indentLinesByFourSpaces(logs));
+                finalLogs = "    Process timed out after %d seconds, may still have logs:\n\n".formatted(timeout) + (logs.isEmpty() ? "<no logs>" : indentLinesByFourSpaces(logs));
             } else {
                 logs = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-                finalLogs = logs.isEmpty() ? "Program has run:\n\n<no logs>" : "Program has run:\n\n" + indentLinesByFourSpaces(logs);
+                finalLogs = logs.isEmpty() ? "    Program has run:\n\n<no logs>" : "    Program has run:\n\n" + indentLinesByFourSpaces(logs);
             }
 
             return compileLogs + "\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n" + finalLogs;
         } catch (Exception e) {
-            return "Issue with writing/compiling code and/or threads:\n\n" + indentLinesByFourSpaces(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n")));
+            return "    Issue with writing/compiling code and/or threads:\n\n    " + e.getMessage() + "\n" + indentLinesByFourSpaces(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n")));
         } finally {
             // Ensure disk cleanup always runs
             try {
