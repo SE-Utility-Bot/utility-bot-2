@@ -6,46 +6,11 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-class StreamCollector implements Runnable {
-    private final HttpRequestHandler rq;
-    StreamCollector(HttpRequestHandler rq) {
-        this.rq = rq;
-    }
-
-    @Override
-    public void run() {
-        try {
-            while (true) {
-                rq.addLogs(rq.getInputStream().read());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-}
-
 public class HttpRequestHandler implements HttpHandler {
-    private final PipedInputStream inputStream = new PipedInputStream(65536);
-    private final OutputStream outputStream;
     private final ByteArrayOutputStream logs = new ByteArrayOutputStream();
-    private final Thread thread;
 
-    public HttpRequestHandler() throws IOException {
-        outputStream = new PipedOutputStream(inputStream);
-        thread = new Thread(new StreamCollector(this));
-        thread.start();
-    }
-
-    public PipedInputStream getInputStream() {
-        return inputStream;
-    }
-
-    public OutputStream getOutputStream() {
-        return outputStream;
-    }
-
-    public void addLogs(int byteValue) {
-        logs.write(byteValue);
+    public ByteArrayOutputStream getOutputStream() {
+        return logs;
     }
 
     @Override

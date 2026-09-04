@@ -3,6 +3,8 @@ package io.github.placereporter99.utilitybot;
 import com.github.mangstadt.sochat4j.ChatMessage;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.io.*;
 import java.util.function.*;
@@ -47,6 +49,7 @@ public class CommandHandler {
                 return buildReply(msg, "Number too big, must be at most 999.");
             }
         });
+        put("execute", (args, msg) -> (new ArbitraryCodeExecutor(10).executeUntrustedCode(args)));
     }
 
     public String handleCommand(ChatMessage message, int id) {
@@ -54,12 +57,13 @@ public class CommandHandler {
         var arr = text.split(" ", 2);
         var get = handlers.get(arr[0]);
         System.out.println("________________________________________________________________________");
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME));
         System.out.print("Room ID: ");
         System.out.println(id);
         System.out.print("Received message: ");
         System.out.println(message.content().getContent());
         System.out.print("Sent by: ");
-        System.out.println(String.format("%s (%s)", message.username(), message.userId()));
+        System.out.printf("%s (%s)%n", message.username(), message.userId());
         System.out.print("Command: ");
         System.out.println(arr[0]);
         String one;
@@ -79,7 +83,7 @@ public class CommandHandler {
         try {
             finalMessage = get.apply(one, message);
         } catch (Exception e) {
-            finalMessage = buildReply(message, "An error occurred: `" + e.toString() + "`");
+            finalMessage = buildReply(message, "An error occurred: `" + e + "`");
         }
         System.out.print("Final message: ");
         System.out.println(finalMessage);

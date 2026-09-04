@@ -3,6 +3,7 @@ package io.github.placereporter99.utilitybot;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import com.github.mangstadt.sochat4j.Room;
 import com.github.mangstadt.sochat4j.RoomNotFoundException;
@@ -11,22 +12,56 @@ import com.github.mangstadt.sochat4j.Site;
 import com.github.mangstadt.sochat4j.InvalidCredentialsException;
 import com.github.mangstadt.sochat4j.ChatClient;
 import com.github.mangstadt.sochat4j.PrivateRoomException;
+import com.github.mangstadt.sochat4j.event.Event;
+import com.github.mangstadt.sochat4j.event.MessageEditedEvent;
 import com.github.mangstadt.sochat4j.event.MessagePostedEvent;
 import com.sun.net.httpserver.HttpServer;
 
+class MessageSendingListener implements Runnable {
+    private final Event event;
+    private final CommandHandler commandHandler;
+    private final Room room;
+    public MessageSendingListener(Event event, CommandHandler commandHandler, Room room) {
+        if (!(event instanceof MessagePostedEvent || event instanceof MessageEditedEvent)) {
+            throw new IllegalArgumentException("Not a message sending event");
+        }
+        this.event = event;
+        this.commandHandler = commandHandler;
+        this.room = room;
+    }
+
+    public void run() {
+        try {
+            if (event instanceof MessagePostedEvent) {
+                var result = commandHandler.handleCommand(((MessagePostedEvent) event).getMessage(), room.getRoomId());
+                if (result != null) {
+                    room.sendMessage(result);
+                }
+            } else if (event instanceof MessageEditedEvent) {
+                var result = commandHandler.handleCommand(((MessageEditedEvent) event).getMessage(), room.getRoomId());
+                if (result != null) {
+                    room.sendMessage(result);
+                }
+            }
+        } catch (RoomPermissionException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
 public class Main {
+    public static <T extends Event> Consumer<T> getListener(Class<T> event, Room room, CommandHandler handler) {
+        return (T e) -> Thread.startVirtualThread(new MessageSendingListener(e, handler, room));
+    }
+
+    public static <T extends Event> void addListener(Class<T> event, Room room, CommandHandler handler) {
+        room.addEventListener(event, getListener(event, room, handler));
+    }
+
     public static void prepareRoom(Room room, CommandHandler handler){
         try {
-            room.addEventListener(MessagePostedEvent.class, event -> {
-                try {
-                    var result = handler.handleCommand(event.getMessage(), room.getRoomId());
-                    if (result != null) {
-                        room.sendMessage(result);
-                    }
-                } catch (RoomPermissionException | IOException e) {
-                    e.printStackTrace();
-                }
-            });
+            addListener(MessagePostedEvent.class, room, handler);
+            addListener(MessageEditedEvent.class, room, handler);
 
             room.sendMessage("UtilityBot (testing) Online!");
         } catch (RoomNotFoundException | IOException e) {
@@ -50,7 +85,7 @@ public class Main {
         var roomIds = new Integer[]{1, 164579};
 
         try (var client = ChatClient.connect(site, email, password)) {
-            var rooms = Arrays.stream(roomIds).map(x -> {try {return client.joinRoom(x);} catch (IOException e) {throw new RuntimeException(e);} catch (RoomNotFoundException ex) {throw new RuntimeException(ex);}}).toArray();
+            var rooms = Arrays.stream(roomIds).map(x -> {try {return client.joinRoom(x);} catch (IOException | RoomNotFoundException e) {throw new RuntimeException(e);}}).toArray();
             var handler = new CommandHandler();
             var http = HttpServer.create(new InetSocketAddress(10000), -1);
 
