@@ -50,7 +50,7 @@ public class CommandHandler {
                 return buildReply(msg, "Number too big, must be at most 999.");
             }
         });
-        put("execute", (args, msg) -> (new ArbitraryCodeExecutor(10).executeUntrustedCode(args)));
+        put("execute", (args, msg) -> ArbitraryCodeExecutor.indentLinesByFourSpaces(new ArbitraryCodeExecutor(10).executeUntrustedCode(args)));
     }
 
     public String handleCommand(ChatMessage message, int id) {
