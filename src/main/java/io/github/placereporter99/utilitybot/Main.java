@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.github.mangstadt.sochat4j.Room;
 import com.github.mangstadt.sochat4j.RoomNotFoundException;
@@ -33,18 +34,26 @@ class MessageSendingListener implements Runnable {
     public void run() {
         try {
             if (event instanceof MessagePostedEvent) {
-                var result = commandHandler.handleCommand(((MessagePostedEvent) event).getMessage(), room.getRoomId());
+                var result = commandHandler.handleCommand(((MessagePostedEvent) event).getMessage());
                 if (result != null) {
                     room.sendMessage(result);
                 }
             } else if (event instanceof MessageEditedEvent) {
-                var result = commandHandler.handleCommand(((MessageEditedEvent) event).getMessage(), room.getRoomId());
+                var result = commandHandler.handleCommand(((MessageEditedEvent) event).getMessage());
                 if (result != null) {
                     room.sendMessage(result);
                 }
             }
-        } catch (RoomPermissionException | IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            try {
+                room.sendMessage("An error occured:\n\n" + Helpers.getFullMessage(e));
+            } catch (IOException ex){
+                System.err.println("Failed to send error in chat due to IO issues:");
+                ex.printStackTrace();
+            } finally {
+                System.err.println("Original error:");
+                e.printStackTrace();
+            }
         }
     }
 }
@@ -82,11 +91,10 @@ public class Main {
         var site = Site.STACKEXCHANGE;
         var email = System.getenv("BOT_EMAIL");
         var password = System.getenv("BOT_PASSWORD");
-        var roomIds = new Integer[]{1, 164579};
+        var roomIds = System.getenv().containsKey("TEST") ? new Integer[]{164605} : new Integer[]{1, 164579};
 
         try (var client = ChatClient.connect(site, email, password)) {
             var rooms = Arrays.stream(roomIds).map(x -> {try {return client.joinRoom(x);} catch (IOException | RoomNotFoundException e) {throw new RuntimeException(e);}}).toArray();
-            var handler = new CommandHandler();
             var http = HttpServer.create(new InetSocketAddress(10000), -1);
 
             http.setExecutor(null);
@@ -96,7 +104,7 @@ public class Main {
             http.createContext("/", httpRequestHandler);
             http.start();
 
-            Arrays.stream(rooms).forEach(x -> prepareRoom((Room) x, handler));
+            Arrays.stream(rooms).forEach(x -> prepareRoom((Room) x, new CommandHandler(((Room) x).getRoomId())));
 
             System.out.println("Bot has started!");
             try {
@@ -108,7 +116,7 @@ public class Main {
                 } catch (Exception ee) {
                     ee.printStackTrace();
                 }
-                main(args);
+                System.exit(1);
             }
 
             Arrays.stream(rooms).forEach(x -> leaveRoom((Room) x));
