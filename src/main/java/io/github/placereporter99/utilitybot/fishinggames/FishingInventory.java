@@ -64,8 +64,11 @@ public class FishingInventory {
     public void throwRod() {
         if (!rodCasted) {
             var waitTime = new SecureRandom().nextLong(600, 1801);
+            if (System.getenv().containsKey("TEST")) {
+                waitTime = 30;
+            }
             nextFishTime = Instant.now().getEpochSecond() + waitTime;
-            future = scheduler.schedule((Runnable) listener, waitTime, TimeUnit.SECONDS);
+            future = scheduler.schedule(listener::get, waitTime, TimeUnit.SECONDS);
             rodCasted = true;
         }
     }

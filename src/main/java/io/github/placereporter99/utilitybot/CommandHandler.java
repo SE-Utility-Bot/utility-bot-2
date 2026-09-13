@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.github.mangstadt.sochat4j.Room;
-import com.github.mangstadt.sochat4j.UserInfo;
 import io.github.classgraph.ClassGraph;
 import io.github.placereporter99.utilitybot.fishinggames.FishingInventory;
 import io.github.placereporter99.utilitybot.fishinggames.FishingPool;
@@ -38,24 +37,24 @@ class ExceptionFishingHandler extends CommandHandler implements FishingHandler {
     public ExceptionFishingHandler(Room room, GithubDatabase gd) {
         super(room, false);
         this.gd = gd;
-        var scanResult = new ClassGraph().enableAllInfo().acceptPackages("**").scan();
-        var classNames = scanResult.getSubclasses(Throwable.class).loadClasses().stream().map(Class::getCanonicalName);
+        var scanResult = new ClassGraph().verbose().enableAllInfo().enableSystemJarsAndModules().scan();
+        var classNames = scanResult.getSubclasses(Throwable.class).loadClasses().stream().map(Class::getCanonicalName).toList();
         classNames.forEach(x -> pool.addItem(x, 1));
         putSingleMsg("cast", "Toggles whether the rod is thrown.", (args, msg) -> {
             var inv = getInventoryOfUser(msg.username(), msg.userId());
             if (inv.isRodCasted()) {
                 var item = inv.pullRod();
                 if (item == null) {
-                    return "*" + msg.username() + " fails to catch anything.*";
+                    return "\uD83D\uDEA9 *" + msg.username() + " fails to catch anything.*";
                 } else {
                     try {
                         saveInventoryOfUser(msg.userId());
                     } catch (Exception _) {}
-                    return "*" + msg.username() + " successfully catches a `" + item + "`.*";
+                    return "\uD83D\uDEA9 *" + msg.username() + " successfully catches a `" + item + "`.*";
                 }
             } else {
                 inv.throwRod();
-                return "*" + msg.username() + " casts away their handlers.*";
+                return "\uD83D\uDEA9 *" + msg.username() + " casts away their handlers.*";
             }
         });
         put("cycle", "Unthrows the rod if it is pulled in, and re-throws it.", (args, msg) -> {
@@ -64,37 +63,37 @@ class ExceptionFishingHandler extends CommandHandler implements FishingHandler {
             if (inv.isRodCasted()) {
                 var item = inv.pullRod();
                 if (item == null) {
-                    l.add("*" + msg.username() + " fails to catch anything.*");
+                    l.add("\uD83D\uDEA9 *" + msg.username() + " fails to catch anything.*");
                 } else {
                     try {
                         saveInventoryOfUser(msg.userId());
                     } catch (Exception _) {}
-                    l.add("*" + msg.username() + " successfully catches a `" + item + "`.*");
+                    l.add("\uD83D\uDEA9 *" + msg.username() + " successfully catches a `" + item + "`.*");
                 }
             }
             inv.throwRod();
-            l.add("*" + msg.username() + " casts away their handlers.*");
+            l.add("\uD83D\uDEA9 *" + msg.username() + " casts away their handlers.*");
             return l.toArray(String[]::new);
         });
         putSingleMsg("inv", "Gets your inventory.", (args, msg) -> {
             var inv = getInventoryOfUser(msg.username(), msg.userId());
-            return "*" + msg.username() + "'s inventory contains: " + inv.getSerializableInventory().entrySet().stream().map(x -> x.getKey() + "(x" + x.getValue() + ")").collect(Collectors.joining(", ")) + "*";
+            return "\uD83D\uDEA9 *" + msg.username() + "'s inventory contains: " + inv.getSerializableInventory().entrySet().stream().map(x -> x.getKey() + "(x" + x.getValue() + ")").collect(Collectors.joining(", ")) + "*";
         });
         putSingleMsg("throw", "Re-throws or sacrifices a caught throwable.", (args, msg) -> {
             var inv = getInventoryOfUser(msg.username(), msg.userId());
             var cond = inv.dispose(args);
             saveInventoryOfUser(msg.userId());
             if (cond) {
-                return "*" + msg.username() + " re-throws `" + args + "` as a sacrifice to the call stack.*";
+                return "\uD83D\uDEA9 *" + msg.username() + " re-throws `" + args + "` as a sacrifice to the call stack.*";
             } else {
-                return "*" + msg.username() + " discovers that they do not have any `" + args + "`.*";
+                return "\uD83D\uDEA9 *" + msg.username() + " discovers that they do not have any `" + args + "`.*";
             }
         });
         putSingleMsg("help", "Gets info about each subcommand for fishing and catching throwables.", (args, msg) -> getFormattedDocs());
     }
 
     public Supplier<Void> getListenerFromUserName(String username) {
-        return () -> {try {room.sendMessage("\uD83D\uDEA9 *" + username + "'s call stack clatters with a new exception*");} catch (Exception e) {System.out.println("Failed to send fishing message"); e.printStackTrace();} return null;};
+        return () -> {try {room.sendMessage("\uD83D\uDEA9 *" + username + "'s call stack clatters with a new exception.*");} catch (Exception e) {System.out.println("Failed to send fishing message"); e.printStackTrace();} return null;};
     }
 
     public FishingInventory getInventoryOfUser(String username, int userId) {
@@ -276,6 +275,7 @@ public class CommandHandler {
             }
             return null;
         });
+        put("throwable", "Play a game involving fishing for throwables.", handlerToBi(new ExceptionFishingHandler(room, gd)));
     }
 
     public CommandHandler(Room room) {
@@ -345,8 +345,8 @@ public class CommandHandler {
         } catch (Exception e) {
             finalMessage = new String[]{buildReply(message, Helpers.indentLinesByFourSpaces("An error occurred:\n" + Helpers.getFullMessage(e)))};
         }
-        System.out.print("Final message: ");
-        System.out.println(finalMessage);
+        System.out.println("Final messages:\n");
+        System.out.println(String.join("\n", finalMessage));
         System.out.println("________________________________________________________________________");
         return finalMessage;
     }

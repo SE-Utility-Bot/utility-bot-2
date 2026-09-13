@@ -30,7 +30,7 @@ public class FishingPool {
     }
 
     public String[] getItems() {
-        return (String[]) fishingList.stream().map(WeightedItem::item).toArray();
+        return fishingList.stream().map(WeightedItem::item).toArray(String[]::new);
     }
 
     public String fish() {

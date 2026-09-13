@@ -32,11 +32,17 @@ class MessageSendingListener implements Runnable {
     public void run() {
         try {
             if (event instanceof MessagePostedEvent) {
+                if (System.getenv().containsKey("TEST") && ((MessagePostedEvent) event).getMessage().userId() != 15121749) {
+                    return;
+                }
                 var result = commandHandler.handleCommand(((MessagePostedEvent) event).getMessage());
                 if (result != null) {
                     Arrays.stream(result).forEach(x -> {try {room.sendMessage(x);} catch (IOException e) {throw new RuntimeException(e);}});
                 }
             } else if (event instanceof MessageEditedEvent) {
+                if (System.getenv().containsKey("TEST") && ((MessageEditedEvent) event).getMessage().userId() != 15121749) {
+                    return;
+                }
                 var result = commandHandler.handleCommand(((MessageEditedEvent) event).getMessage());
                 if (result != null) {
                     Arrays.stream(result).forEach(x -> {try {room.sendMessage(x);} catch (IOException e) {throw new RuntimeException(e);}});
@@ -86,10 +92,10 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        var site = Site.STACKEXCHANGE;
+        var site = Site.STACKOVERFLOW;
         var email = System.getenv("BOT_EMAIL");
         var password = System.getenv("BOT_PASSWORD");
-        var roomIds = System.getenv().containsKey("TEST") ? new Integer[]{164605} : new Integer[]{1, 164579};
+        var roomIds = new Integer[]{260035};
 
         try (var client = ChatClient.connect(site, email, password)) {
             var rooms = Arrays.stream(roomIds).map(x -> {try {return client.joinRoom(x);} catch (IOException | RoomNotFoundException e) {throw new RuntimeException(e);}}).toArray();

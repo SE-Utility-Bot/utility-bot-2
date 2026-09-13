@@ -2,6 +2,7 @@ package io.github.placereporter99.utilitybot;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +16,7 @@ public class HttpRequestHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        var response = ("<h1><a href=\"https://chat.stackexchange.com/rooms/164579/utility-bot-hut\">Try it here</a></h1><br><h2>Logs</h2><br><pre>" + logs.toString(StandardCharsets.UTF_8) + "</pre>").getBytes(StandardCharsets.UTF_8);
+        var response = ("<h1><a href=\"https://chat.stackoverflow.com/rooms/260035/utility-bot-hut\">Try it here</a></h1><br><h2>Logs</h2><br><pre>" + StringEscapeUtils.escapeHtml4(logs.toString(StandardCharsets.UTF_8)) + "</pre>").getBytes(StandardCharsets.UTF_8);
         exchange.sendResponseHeaders(200, response.length);
         OutputStream os = exchange.getResponseBody();
         os.write(response);
