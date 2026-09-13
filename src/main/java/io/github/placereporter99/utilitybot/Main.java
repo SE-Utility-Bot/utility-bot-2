@@ -4,11 +4,9 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import com.github.mangstadt.sochat4j.Room;
 import com.github.mangstadt.sochat4j.RoomNotFoundException;
-import com.github.mangstadt.sochat4j.RoomPermissionException;
 import com.github.mangstadt.sochat4j.Site;
 import com.github.mangstadt.sochat4j.InvalidCredentialsException;
 import com.github.mangstadt.sochat4j.ChatClient;
@@ -36,12 +34,12 @@ class MessageSendingListener implements Runnable {
             if (event instanceof MessagePostedEvent) {
                 var result = commandHandler.handleCommand(((MessagePostedEvent) event).getMessage());
                 if (result != null) {
-                    room.sendMessage(result);
+                    Arrays.stream(result).forEach(x -> {try {room.sendMessage(x);} catch (IOException e) {throw new RuntimeException(e);}});
                 }
             } else if (event instanceof MessageEditedEvent) {
                 var result = commandHandler.handleCommand(((MessageEditedEvent) event).getMessage());
                 if (result != null) {
-                    room.sendMessage(result);
+                    Arrays.stream(result).forEach(x -> {try {room.sendMessage(x);} catch (IOException e) {throw new RuntimeException(e);}});
                 }
             }
         } catch (Exception e) {
@@ -104,7 +102,7 @@ public class Main {
             http.createContext("/", httpRequestHandler);
             http.start();
 
-            Arrays.stream(rooms).forEach(x -> prepareRoom((Room) x, new CommandHandler(((Room) x).getRoomId())));
+            Arrays.stream(rooms).forEach(x -> prepareRoom((Room) x, new CommandHandler((Room) x)));
 
             System.out.println("Bot has started!");
             try {
