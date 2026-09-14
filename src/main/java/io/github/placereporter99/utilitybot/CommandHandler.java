@@ -37,7 +37,7 @@ class ExceptionFishingHandler extends CommandHandler implements FishingHandler {
     public ExceptionFishingHandler(Room room, GithubDatabase gd) {
         super(room, false);
         this.gd = gd;
-        var scanResult = new ClassGraph().verbose().enableAllInfo().enableSystemJarsAndModules().scan();
+        var scanResult = new ClassGraph().verbose().enableSystemJarsAndModules().ignoreClassVisibility().scan();
         var classNames = scanResult.getSubclasses(Throwable.class).loadClasses().stream().map(Class::getCanonicalName).toList();
         classNames.forEach(x -> pool.addItem(x, 1));
         putSingleMsg("cast", "Toggles whether the rod is thrown.", (args, msg) -> {
@@ -77,7 +77,7 @@ class ExceptionFishingHandler extends CommandHandler implements FishingHandler {
         });
         putSingleMsg("inv", "Gets your inventory.", (args, msg) -> {
             var inv = getInventoryOfUser(msg.username(), msg.userId());
-            return "\uD83D\uDEA9 *" + msg.username() + "'s inventory contains: " + inv.getSerializableInventory().entrySet().stream().map(x -> x.getKey() + "(x" + x.getValue() + ")").collect(Collectors.joining(", ")) + "*";
+            return "\uD83D\uDEA9 *" + msg.username() + "'s inventory contains: " + inv.getSerializableInventory().entrySet().stream().map(x -> "`" + x.getKey() + "` (x" + x.getValue() + ")").collect(Collectors.joining(", ")) + "*";
         });
         putSingleMsg("throw", "Re-throws or sacrifices a caught throwable.", (args, msg) -> {
             var inv = getInventoryOfUser(msg.username(), msg.userId());

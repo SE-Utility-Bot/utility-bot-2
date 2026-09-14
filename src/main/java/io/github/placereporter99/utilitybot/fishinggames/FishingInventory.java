@@ -25,12 +25,14 @@ public class FishingInventory {
 
     public void addInventory(Map<String, Long> inventory) {
         this.inventory.putAll(inventory);
+        purgeZeroes();
     }
 
     public void addSerializableInventory(Map<String, String> inventory) {
         var intermediateMap = new HashMap<String, Long>();
         inventory.forEach((k, v) -> intermediateMap.put(k, Long.parseLong(v)));
-        this.inventory.putAll(intermediateMap);
+        addInventory(intermediateMap);
+        purgeZeroes();
     }
 
     public boolean isRodCasted() {
@@ -38,11 +40,17 @@ public class FishingInventory {
     }
 
     public Map<String, Long> getInventory() {
+        purgeZeroes();
         return inventory;
     }
 
     public Map<String, String> getSerializableInventory() {
+        purgeZeroes();
         return Map.ofEntries(inventory.entrySet().stream().map(x -> Map.entry(x.getKey(), x.getValue().toString())).toArray(Map.Entry[]::new));
+    }
+
+    public void purgeZeroes() {
+        new HashMap<>(inventory).forEach((k, v) -> inventory.remove(k, 0L));
     }
 
     public String pullRod() {
@@ -52,6 +60,7 @@ public class FishingInventory {
             if (Instant.now().getEpochSecond() >= nextFishTime && Instant.now().getEpochSecond() <= nextFishTime + 1800) {
                 var result = pool.fish();
                 inventory.put(result, inventory.getOrDefault(result, 0L) + 1);
+                purgeZeroes();
                 return result;
             } else {
                 return null;
@@ -76,6 +85,7 @@ public class FishingInventory {
     public boolean dispose(String item) {
         if (contains(item)) {
             inventory.compute(item, (k, v) -> v - 1);
+            purgeZeroes();
             return true;
         } else {
             return false;
