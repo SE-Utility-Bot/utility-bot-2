@@ -38,7 +38,7 @@ class ExceptionFishingHandler extends CommandHandler implements FishingHandler {
         super(room, false);
         this.gd = gd;
         var scanResult = new ClassGraph().verbose().enableSystemJarsAndModules().ignoreClassVisibility().scan();
-        var classNames = scanResult.getSubclasses(Throwable.class).loadClasses().stream().map(Class::getCanonicalName).toList();
+        var classNames = scanResult.getSubclasses(Throwable.class).getNames();
         classNames.forEach(x -> pool.addItem(x, 1));
         putSingleMsg("cast", "Toggles whether the rod is thrown.", (args, msg) -> {
             var inv = getInventoryOfUser(msg.username(), msg.userId());
