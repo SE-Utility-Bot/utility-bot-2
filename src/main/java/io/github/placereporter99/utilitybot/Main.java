@@ -92,10 +92,10 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        var site = Site.STACKOVERFLOW;
+        var site = Site.META;
         var email = System.getenv("BOT_EMAIL");
         var password = System.getenv("BOT_PASSWORD");
-        var roomIds = new Integer[]{260035};
+        var roomIds = new Integer[]{1838};
 
         try (var client = ChatClient.connect(site, email, password)) {
             var rooms = Arrays.stream(roomIds).map(x -> {try {return client.joinRoom(x);} catch (IOException | RoomNotFoundException e) {throw new RuntimeException(e);}}).toArray();
