@@ -22,6 +22,8 @@ import io.github.placereporter99.utilitybot.webapi.Pastebin;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.text.StringEscapeUtils;
 
+import javax.swing.plaf.synth.SynthDesktopIconUI;
+
 interface FishingHandler {
     Supplier<Void> getListenerFromUserName(String username);
     FishingInventory loadInventoryOfUser(String username, int userId);
@@ -37,9 +39,13 @@ class ExceptionFishingHandler extends CommandHandler implements FishingHandler {
     public ExceptionFishingHandler(Room room, GithubDatabase gd) {
         super(room, false);
         this.gd = gd;
-        var scanResult = new ClassGraph().verbose().enableSystemJarsAndModules().ignoreClassVisibility().removeTemporaryFilesAfterScan().scan();
-        var classNames = scanResult.getSubclasses(Throwable.class).getNames();
-        classNames.forEach(x -> pool.addItem(x, 1));
+        try (var resource = CommandHandler.class.getClassLoader().getResourceAsStream("status.txt")) {
+            var classNames = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines().toList();
+            classNames.forEach(x -> pool.addItem(x, 1));
+        } catch (IOException e) {
+            System.err.println("Failed to initialize fishing handler.");
+            throw new RuntimeException(e);
+        }
         putSingleMsg("cast", "Toggles whether the rod is thrown.", (args, msg) -> {
             var inv = getInventoryOfUser(msg.username(), msg.userId());
             if (inv.isRodCasted()) {
