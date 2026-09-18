@@ -39,7 +39,7 @@ class ExceptionFishingHandler extends CommandHandler implements FishingHandler {
     public ExceptionFishingHandler(Room room, GithubDatabase gd) {
         super(room, false);
         this.gd = gd;
-        try (var resource = CommandHandler.class.getClassLoader().getResourceAsStream("status.txt")) {
+        try (var resource = CommandHandler.class.getClassLoader().getResourceAsStream("errors.txt")) {
             var classNames = new BufferedReader(new InputStreamReader(resource, StandardCharsets.UTF_8)).lines().toList();
             classNames.forEach(x -> pool.addItem(x, 1));
         } catch (IOException e) {
